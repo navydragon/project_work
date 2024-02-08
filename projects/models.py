@@ -36,6 +36,7 @@ class Member (models.Model):
     email = models.EmailField(blank=True, null=True)
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='members')
     score = models.IntegerField(null=True, blank=True)
+    group_name = models.CharField(max_length=20, blank=True, null=True)
 
 
 class Customer(models.Model):
