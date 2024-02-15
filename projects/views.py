@@ -56,8 +56,7 @@ class ParticipationViewSet (viewsets.ModelViewSet):
         if team.category != project.category:
             raise serializers.ValidationError({"message":"Балл команды меньше минимально допустимого"},400)
 
-
-        if project.participants.count() > project.max_teams:
+        if project.participants.count() >= project.max_teams:
             raise serializers.ValidationError({"message":"Достигнуто максимальное количество участников проекта."},400)
 
         serializer.validated_data['choose_date'] = timezone.now()
