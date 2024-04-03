@@ -1,14 +1,14 @@
 # myapp/views.py
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets, mixins, generics
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
 
-from .models import Team, Semester, Project, Participation, Tag, Member
+from .models import Team, Semester, Project, Participation, Tag, Member, CPDSProject
 from .serializers import TeamSerializer, SemesterSerializer, ProjectSerializer, \
-    ParticipationSerializer, TagSerializer, MemberSerializer
+    ParticipationSerializer, TagSerializer, MemberSerializer, CPDSProjectSerializer
 
 from django.utils import timezone
 
@@ -85,3 +85,8 @@ class MemberViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         team_id = self.kwargs.get('team_id')
         serializer.save(team_id=team_id)
+
+
+class ListCPDSProjects(generics.ListAPIView):
+    queryset = CPDSProject.objects.filter(is_active=True)
+    serializer_class = CPDSProjectSerializer

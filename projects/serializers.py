@@ -1,9 +1,15 @@
 # myapp/serializers.py
 from rest_framework import serializers
 from .models import Team, Semester, Project, Participation, Customer, Tag, \
-    Member
+    Member, CPDSProject
 
 
+
+class CPDSProjectSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CPDSProject
+        fields = '__all__'
 
 class CostomerSerializer (serializers.ModelSerializer):
 

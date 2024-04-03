@@ -92,4 +92,43 @@ class Participation(models.Model):
 
 
 
+PROJECT_STATUS_CHOICES = [
+    ('new', 'Новый'),
+    ('progress', 'Продолжающийся'),
+]
 
+
+class CPDSProject(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=255, verbose_name='Название проекта')
+    problem = models.TextField(blank=True, null=True, verbose_name='Описание проекта, проблема')
+    status = models.CharField(max_length=20, choices=PROJECT_STATUS_CHOICES, default='new', verbose_name='Статус проекта')
+    link = models.CharField(max_length=255, blank=True, null=True, verbose_name='Финальная презентация предыдущего этапа')
+    task = models.TextField(blank=True, null=True, verbose_name='Этап проекта (что предстоит сделать команде в течение семестра)')
+    customer = models.CharField(max_length=255, blank=True, null=True, verbose_name='Название института')
+    course_title = models.CharField(max_length=100, blank=True, null=True, verbose_name='Курс')
+    team_size = models.IntegerField(blank=True, null=True, verbose_name='Количество человек в команде')
+    required_by = models.TextField(max_length=100, blank=True, null=True, verbose_name='Кто требуется')
+    functionality = models.TextField(blank=True, null=True, verbose_name='Функционал')
+    required_skills = models.TextField(blank=True, null=True, verbose_name='Что должен уметь')
+    mentor_full_name = models.CharField(max_length=100, blank=True, null=True, verbose_name='ФИО наставника проекта')
+    image = models.FileField(upload_to='cpds_projects', null=True, blank=True, verbose_name='Изображение')
+    description = models.TextField(blank=True, null=True, verbose_name='Описание')
+    request_link = models.URLField(blank=True, null=True, verbose_name='Ссылка на анкету')
+    is_active = models.BooleanField(default=True, verbose_name='Активно')
+
+
+class CPDSRequest(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    surname = models.CharField(max_length=255, blank=True, null=True)
+    name = models.CharField(max_length=255, blank=True, null=True)
+    fathername = models.CharField(max_length=255, blank=True, null=True)
+    university_short = models.CharField(max_length=255, blank=True, null=True)
+    course_title = models.CharField(max_length=255, blank=True, null=True)
+    project = models.ForeignKey('CPDSProject', on_delete=models.CASCADE)
+    competences = models.TextField(blank=True, null=True)
+    reasons = models.TextField(blank=True, null=True)
+    phone = models.CharField(max_length=255, blank=True, null=True)
+    telegram_link = models.CharField(max_length=255, blank=True, null=True)
+    experience = models.TextField(blank=True, null=True)
+    questions = models.TextField(blank=True, null=True)

@@ -2,7 +2,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import TeamViewSet, SemesterViewSet, ProjectViewSet, \
-    ParticipationViewSet, TagViewSet, MemberViewSet
+    ParticipationViewSet, TagViewSet, MemberViewSet, ListCPDSProjects
 
 router = DefaultRouter()
 
@@ -18,5 +18,6 @@ router.register(r'teams/(?P<team_id>[-\w]+)/members', MemberViewSet, basename='t
 
 
 urlpatterns = [
+    path('cpds_projects/', ListCPDSProjects.as_view()),
     path('', include(router.urls)),
 ]

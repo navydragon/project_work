@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from django.contrib import admin
-from .models import Semester, Team, Project, Participation, Tag, Customer
+from .models import Semester, Team, Project, Participation, Tag, Customer, CPDSProject
 
 @admin.register(Semester)
 class SemesterAdmin(admin.ModelAdmin):
@@ -31,3 +31,14 @@ class TagAdmin(admin.ModelAdmin):
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
     list_display = ('id','name','shortname','description','logo')
+
+
+@admin.register(CPDSProject)
+class CPDSProjectAdmin(admin.ModelAdmin):
+    list_display = ('name', 'problem', 'status', 'link', 'task', 'customer', 'course_title', 'team_size', 'required_by',
+                    'functionality', 'required_skills', 'mentor_full_name', 'is_active')
+    list_filter = ('status', 'customer', 'course_title', 'is_active')
+    search_fields = ('name', 'problem', 'task', 'functionality', 'required_skills', 'mentor_full_name')
+    readonly_fields = ('id',)
+
+
