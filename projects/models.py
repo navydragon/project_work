@@ -108,7 +108,7 @@ class CPDSProject(models.Model):
     customer = models.CharField(max_length=255, blank=True, null=True, verbose_name='Название института')
     course_title = models.CharField(max_length=100, blank=True, null=True, verbose_name='Курс')
     team_size = models.IntegerField(blank=True, null=True, verbose_name='Количество человек в команде')
-    required_by = models.TextField(max_length=100, blank=True, null=True, verbose_name='Кто требуется')
+    required_by = models.TextField(blank=True, null=True, verbose_name='Кто требуется')
     functionality = models.TextField(blank=True, null=True, verbose_name='Функционал')
     required_skills = models.TextField(blank=True, null=True, verbose_name='Что должен уметь')
     mentor_full_name = models.CharField(max_length=100, blank=True, null=True, verbose_name='ФИО наставника проекта')
