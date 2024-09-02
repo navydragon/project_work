@@ -25,6 +25,7 @@ class Team(models.Model):
     semester = models.ForeignKey(Semester, on_delete=models.CASCADE, related_name='teams')
     category = models.IntegerField(null=True, blank=True)
 
+
     def __str__(self):
         return self.name
 
@@ -75,6 +76,8 @@ class Project(models.Model):
     teams = models.ManyToManyField(Team, through='Participation', related_name='projects')
     category = models.IntegerField(null=True, blank=True)
     tags = models.ManyToManyField(Tag, related_name='projects')
+    is_new = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
