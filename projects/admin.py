@@ -16,7 +16,7 @@ class TeamsAdmin(admin.ModelAdmin):
 
 @admin.register(Project)
 class ProjectsAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'customer', 'description', 'link')
+    list_display = ('id', 'name', 'customer', 'description', 'link','is_new','is_active')
 
 
 @admin.register(Participation)
