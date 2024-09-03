@@ -18,7 +18,7 @@ class Team(models.Model):
     captain_fullname = models.CharField(max_length=255)
     captain_phone = models.CharField(max_length=20, blank=True, null=True)
     captain_email = models.EmailField(blank=True, null=True)
-    tutor_fullname = models.CharField(max_length=20, blank=True, null=True)
+    tutor_fullname = models.CharField(max_length=200, blank=True, null=True)
     tutor_email = models.EmailField(blank=True, null=True)
     group_name = models.CharField(max_length=20, blank=True, null=True)
     score = models.PositiveIntegerField(blank=True, null=True)
