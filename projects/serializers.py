@@ -110,5 +110,5 @@ class TeamSerializer(serializers.ModelSerializer):
 
     def get_possible_projects(self, obj):
 
-        filtered_projects = Project.objects.filter(category=obj.category)
+        filtered_projects = Project.objects.filter(category=obj.category, is_active=True)
         return ProjectShortSerializer(filtered_projects, many=True).data
