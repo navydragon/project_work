@@ -14,12 +14,13 @@ class Command(BaseCommand):
         print("Columns in the Excel file:", df.columns)
         for _, row in df.iterrows():
             Team.objects.create(
-                name=row['Команда'],
-                captain_fullname=row['Капитан команды'],
-                tutor_fullname=row['Наставник осень 24'],
-                tutor_email=row['e-mail'],
-                group_name=row['Учебная группа'],
-                category=row['допуск'],
+                name=row['name'],
+                captain_fullname=row['captain_fullname'],
+                tutor_fullname=row['tutor_fullname'],
+                tutor_email=row['tutor_email'],
+                group_name=row['group_name'],
+                category=row['category'],
+                previous_project_name=row['previous_project_name'],
                 semester=semester
             )
 
