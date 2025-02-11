@@ -25,6 +25,7 @@ class Team(models.Model):
     semester = models.ForeignKey(Semester, on_delete=models.CASCADE, related_name='teams')
     category = models.IntegerField(null=True, blank=True)
     previous_project_name = models.CharField(max_length=300, blank=True, null=True)
+    old_name = models.CharField(max_length=255, blank=True, null=True)
 
 
     def __str__(self):
