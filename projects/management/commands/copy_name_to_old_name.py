@@ -9,7 +9,7 @@ class Command(BaseCommand):
         updated_count = 0
 
         for team in teams:
-            if team.name and not team.old_name:
+            if team.name:
                 team.old_name = team.name
                 team.save(update_fields=['old_name'])
                 updated_count += 1
