@@ -96,6 +96,11 @@ class Participation(models.Model):
         return f"{self.team.name} - {self.project.name}"
 
 
+class Setting(models.Model):
+    code = models.CharField(max_length=100, unique=True)
+    value = models.CharField(max_length=300)
+
+
 
 PROJECT_STATUS_CHOICES = [
     ('new', 'Новый'),

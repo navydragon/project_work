@@ -1,12 +1,15 @@
 # myapp/views.py
-from rest_framework import viewsets, mixins, generics
+from rest_framework import viewsets, mixins, generics, status, permissions
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
+from rest_framework.response import Response
+
+from .permissions import IsAdminOrReadOnly
 
 
-from .models import Team, Semester, Project, Participation, Tag, Member, CPDSProject
+from .models import Team, Semester, Project, Participation, Tag, Member, CPDSProject, Setting
 from .serializers import TeamSerializer, SemesterSerializer, ProjectSerializer, \
     ParticipationSerializer, TagSerializer, MemberSerializer, CPDSProjectSerializer
 
@@ -18,14 +21,20 @@ class TeamViewSet(viewsets.ModelViewSet):
     filterset_fields = ['semester']
     search_fields = ['name', 'captain_fullname']
     serializer_class = TeamSerializer
+    permission_classes = [IsAdminOrReadOnly]
 
     def get_queryset(self):
         return Team.objects.prefetch_related('participation__project','participation__team','members').all()
 
 
+    def list(self, request, *args, **kwargs):
+        return Response({"detail": "Доступ к списку запрещен."}, status=status.HTTP_403_FORBIDDEN)
+
+
 class SemesterViewSet(viewsets.ModelViewSet):
     queryset = Semester.objects.all()
     serializer_class = SemesterSerializer
+    permission_classes = [IsAdminOrReadOnly]
 
     def perform_create(self, serializer):
         last_position = Semester.objects.all().order_by('-position').first()
@@ -40,14 +49,23 @@ class SemesterViewSet(viewsets.ModelViewSet):
 class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
+    permission_classes = [IsAdminOrReadOnly]
 
     def get_queryset(self):
         return Project.objects.prefetch_related('participants').all()
 
 
-class ParticipationViewSet (viewsets.ModelViewSet):
+class ParticipationViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     queryset = Participation.objects.all()
     serializer_class = ParticipationSerializer
+
+    def get_permissions(self):
+        """Динамически выбираем разрешения в зависимости от `open_registration`."""
+        open_registration = Setting.objects.filter(code="open_registration").first()
+        if not open_registration or open_registration.value != "true":
+            return [IsAdminOrReadOnly()]  # Разрешение только для админов
+        return [permissions.AllowAny()]
+
 
     def perform_create(self, serializer):
         team = get_object_or_404(Team, id=serializer.validated_data.get('team').id)
@@ -76,7 +94,7 @@ class ParticipationViewSet (viewsets.ModelViewSet):
 class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
-
+    permission_classes = [IsAdminOrReadOnly]
 
 class MemberViewSet(viewsets.ModelViewSet):
     queryset = Member.objects.all()

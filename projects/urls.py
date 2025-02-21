@@ -21,3 +21,5 @@ urlpatterns = [
     path('cpds_projects/', ListCPDSProjects.as_view()),
     path('', include(router.urls)),
 ]
+
+

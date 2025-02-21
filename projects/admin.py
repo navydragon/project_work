@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from django.contrib import admin
-from .models import Semester, Team, Project, Participation, Tag, Customer, CPDSProject, Member
+from .models import Semester, Team, Project, Participation, Tag, Customer, CPDSProject, Member, Setting
 
 
 @admin.register(Semester)
@@ -49,3 +49,8 @@ class MemberAdmin(admin.ModelAdmin):
     search_fields = ('fullname', 'email', 'phone')  # Поля для поиска
     list_filter = ('team', 'group_name')  # Фильтры
     ordering = ('fullname',)  # Сортировка по имени
+
+
+@admin.register(Setting)
+class SettingsAdmin(admin.ModelAdmin):
+    list_display = ('id', 'code', 'value')
