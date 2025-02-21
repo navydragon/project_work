@@ -5,6 +5,7 @@ from rest_framework import filters
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.response import Response
+from rest_framework.routers import APIRootView
 
 from .permissions import IsAdminOrReadOnly
 
@@ -14,6 +15,8 @@ from .serializers import TeamSerializer, SemesterSerializer, ProjectSerializer, 
     ParticipationSerializer, TagSerializer, MemberSerializer, CPDSProjectSerializer
 
 from django.utils import timezone
+
+
 
 class TeamViewSet(viewsets.ModelViewSet):
     queryset = Team.objects.all()
