@@ -35,12 +35,9 @@ INSTALLED_APPS = [
     'django_filters',
     'projects',
     'events',
-    'silk',
-
 ]
 
 MIDDLEWARE = [
-    'silk.middleware.SilkyMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
