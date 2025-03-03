@@ -8,6 +8,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('projects.urls')),
+    path('api/', include('events.urls')),
 ]
 
 urlpatterns += [path('silk/', include('silk.urls', namespace='silk'))]
