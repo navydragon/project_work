@@ -12,5 +12,5 @@ class EventAdmin(admin.ModelAdmin):
 @admin.register(EventRequest)
 class EventRequestAdmin(admin.ModelAdmin):
     list_display = ("event", "date", "full_name", "class_number", "school", "phone_number")
-    list_filter = ("date", "event", "school")
-    search_fields = ("full_name", "class_number", "school", "phone_number")
+    list_filter = ("date", "event", "school","direction")
+    search_fields = ("full_name", "class_number", "school", "phone_number","direction")
