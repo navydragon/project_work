@@ -28,13 +28,27 @@ class EventRequestAPIView(APIView):
         serializer = EventRequestSerializer(requests, many=True)
         return Response(serializer.data)
 
+    def post(self, request):
+        events = request.data.get("events", [])
+        errors = []
+        created_requests = []
 
-    def post(self, request, event_id):
-        event = get_object_or_404(Event, pk=event_id)
-        data = request.data.copy()
-        data["event"] = event.id
-        serializer = EventRequestSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        for event_id in events:
+            event = Event.objects.filter(id=event_id).first()
+            if not event:
+                errors.append({"event_id": event_id, "error": "Мероприятие не найдено"})
+                continue
+
+            data = request.data.copy()
+            data["event"] = event.id
+            serializer = EventRequestSerializer(data=data)
+            if serializer.is_valid():
+                serializer.save()
+                created_requests.append(serializer.data)
+            else:
+                errors.append({"event_id": event_id, "errors": serializer.errors})
+
+        if errors:
+            return Response({"created": created_requests, "errors": errors}, status=status.HTTP_207_MULTI_STATUS)
+
+        return Response(created_requests, status=status.HTTP_201_CREATED)
