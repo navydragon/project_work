@@ -3,6 +3,9 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from django.core.mail import send_mail
+
+
 from events.models import Event
 from events.serializers import EventSerializer, EventRequestSerializer
 
@@ -48,7 +51,41 @@ class EventRequestAPIView(APIView):
             else:
                 errors.append({"event_id": event_id, "errors": serializer.errors})
 
+        if created_requests:
+            send_event_request_email(
+                full_name=request.data.get("full_name"),
+                school=request.data.get("school"),
+                class_number=request.data.get("class_number"),
+                phone_number=request.data.get("phone_number"),
+                events=Event.objects.filter(id__in=events)
+            )
+
         if errors:
             return Response({"created": created_requests, "errors": errors}, status=status.HTTP_207_MULTI_STATUS)
 
         return Response(created_requests, status=status.HTTP_201_CREATED)
+
+
+
+def send_event_request_email(full_name, school, class_number, phone_number, events):
+    subject = "Заявка на участие в мероприятиях"
+    message = f"""
+Вам поступила новая заявка на участие в мероприятиях Института экономики и финансов.
+
+Имя - {full_name}
+Школа - {school}
+Класс - {class_number}
+Номер телефона - {phone_number}
+
+Выбранные мероприятия:
+"""
+    for idx, event in enumerate(events, 1):
+        message += f"\n{idx}. {event.discipline} {event.date.strftime('%d.%m.%Y')}   {event.start_time}-{event.end_time} преп. {event.tutor} ауд. {event.classroom}"
+
+    send_mail(
+        subject,
+        message,
+        from_email=None,
+        recipient_list=['ief07@bk.ru'],
+        fail_silently=False
+    )
