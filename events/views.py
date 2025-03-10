@@ -86,6 +86,6 @@ def send_event_request_email(full_name, school, class_number, phone_number, even
         subject,
         message,
         from_email=None,
-        recipient_list=['ief07@bk.ru'],
+        recipient_list=['priem-ief@yandex.ru'],
         fail_silently=False
     )
