@@ -9,6 +9,7 @@ django-debug-toolbar==4.3.0
 django-filter==23.5
 django-svg-image-form-field==1.0.1
 djangorestframework==3.14.0
+# django-ratelimit==4.1.0  # Временно отключен
 docopt==0.6.2
 et-xmlfile==1.1.0
 gprof2dot==2024.6.6

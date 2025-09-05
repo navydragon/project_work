@@ -13,12 +13,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-$4^8=c7ffb%^nkvg(70wu-1%wg=-k)jiul$m3jc6c66j@h+^$j'
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-$4^8=c7ffb%^nkvg(70wu-1%wg=-k)jiul$m3jc6c66j@h+^$j')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,project.emiit.ru').split(',')
 
 
 # Application definition
@@ -67,11 +67,12 @@ TEMPLATES = [
     },
 ]
 
-ALLOWED_HOSTS = ['*']
-CORS_ORIGIN_ALLOW_ALL = True
-CORS_ORIGIN_WHITELIST = (
-       'http://localhost:3000',
-)
+# ALLOWED_HOSTS теперь настраивается выше через .env
+
+# CORS настройки
+CORS_ORIGIN_ALLOW_ALL = os.getenv('CORS_ORIGIN_ALLOW_ALL', 'False').lower() == 'true'
+CORS_ORIGIN_WHITELIST = os.getenv('CORS_ORIGIN_WHITELIST', 'http://localhost:3000,https://project.emiit.ru').split(',')
+CORS_ALLOW_CREDENTIALS = True
 INTERNAL_IPS = [
     "213.208.179.169",
     "127.0.0.1",
@@ -95,8 +96,6 @@ DATABASES = {
         'PORT': os.getenv('DB_PORT'),
     }
 }
-
-DEBUG = os.getenv('DEBUG', False) == 'True'
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -163,6 +162,76 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 SERVER_EMAIL = os.getenv('EMAIL_HOST_USER')
 DEFAULT_FROM_EMAIL = os.getenv('EMAIL_HOST_USER')
 
+# ==================== НАСТРОЙКИ БЕЗОПАСНОСТИ ====================
+
+# Безопасность для продакшена
+if not DEBUG:
+    # HTTPS настройки
+    SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_HSTS_SECONDS = 31536000  # 1 год
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    
+    # Безопасность сессий
+    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Strict'
+    
+    # Безопасность CSRF
+    CSRF_COOKIE_SECURE = True
+    CSRF_COOKIE_HTTPONLY = True
+    CSRF_COOKIE_SAMESITE = 'Strict'
+    
+    # Безопасность X-Frame-Options
+    X_FRAME_OPTIONS = 'DENY'
+    
+    # Дополнительные заголовки безопасности
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+
+# Логирование безопасности
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'security': {
+            'format': 'SECURITY {asctime} {levelname} {module} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'security_file': {
+            'level': 'WARNING',
+            'class': 'logging.FileHandler',
+            'filename': 'security.log',
+            'formatter': 'security',
+        },
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'django.log',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django.security': {
+            'handlers': ['security_file'],
+            'level': 'WARNING',
+            'propagate': True,
+        },
+        'django.request': {
+            'handlers': ['file'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+    },
+}
 
 # LOGGING = {
 #     'version': 1,

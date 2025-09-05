@@ -7,7 +7,7 @@ class Command(BaseCommand):
     help = 'Import teams from Excel file'
 
     def handle(self, *args, **kwargs):
-        file_path = 'files/teams2.xlsx'
+        file_path = 'files/teams3.xlsx'
         df = pd.read_excel(file_path)
         # Assuming you have a semester instance, replace with appropriate logic
         semester = Semester.objects.last()  # Adjust this as per your requirements
@@ -20,6 +20,7 @@ class Command(BaseCommand):
                 tutor_email=row['tutor_email'],
                 group_name=row['group_name'],
                 category=row['category'],
+                captain_email=row['captain_email'],
                 previous_project_name=row['previous_project_name'],
                 semester=semester
             )

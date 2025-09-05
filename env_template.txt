@@ -1,0 +1,29 @@
+# Скопируйте этот файл как .env и настройте под свои нужды
+
+# Django настройки
+DEBUG=True
+SECRET_KEY=django-insecure-$4^8=c7ffb%^nkvg(70wu-1%wg=-k)jiul$m3jc6c66j@h+^$j
+ALLOWED_HOSTS=localhost,127.0.0.1,project.emiit.ru
+
+# База данных
+DB_ENGINE=django.db.backends.sqlite3
+DB_NAME=db.sqlite3
+DB_USER=
+DB_PASSWORD=
+DB_HOST=
+DB_PORT=
+
+# CORS настройки
+CORS_ORIGIN_ALLOW_ALL=False
+CORS_ORIGIN_WHITELIST=http://localhost:3000,https://project.emiit.ru
+
+# Email настройки (настройте по необходимости)
+EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
+EMAIL_HOST=
+EMAIL_PORT=
+EMAIL_USE_SSL=
+EMAIL_HOST_USER=
+EMAIL_HOST_PASSWORD=
+
+# Frontend URL
+FRONT_END=https://project.emiit.ru

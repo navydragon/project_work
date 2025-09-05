@@ -1,5 +1,8 @@
 # myapp/serializers.py
 from rest_framework import serializers
+from django.core.exceptions import ValidationError
+from django.core.validators import EmailValidator, RegexValidator
+import re
 from .models import Team, Semester, Project, Participation, Customer, Tag, \
     Member, CPDSProject
 
@@ -104,11 +107,48 @@ class TeamSerializer(serializers.ModelSerializer):
     possible_projects = serializers.SerializerMethodField()
     members = MemberSerializer(read_only=True, many=True)
     semester = SemesterSerializer()
+    
     class Meta:
         model = Team
         fields = '__all__'
 
-    def get_possible_projects(self, obj):
+    def validate_captain_email(self, value):
+        """Валидация email капитана команды"""
+        if value:
+            email_validator = EmailValidator()
+            email_validator(value)
+        return value
 
+
+    def validate_tutor_email(self, value):
+        """Валидация email куратора"""
+        if value:
+            email_validator = EmailValidator()
+            email_validator(value)
+        return value
+
+    def validate_name(self, value):
+        """Валидация названия команды"""
+        if not value or len(value.strip()) < 2:
+            raise ValidationError("Название команды должно содержать минимум 2 символа")
+        
+        # Проверка на потенциально опасные символы
+        if re.search(r'[<>"\']', value):
+            raise ValidationError("Название команды содержит недопустимые символы")
+        
+        return value.strip()
+
+    def validate_captain_fullname(self, value):
+        """Валидация ФИО капитана"""
+        if not value or len(value.strip()) < 2:
+            raise ValidationError("ФИО капитана должно содержать минимум 2 символа")
+        
+        # Проверка на потенциально опасные символы
+        if re.search(r'[<>"\']', value):
+            raise ValidationError("ФИО капитана содержит недопустимые символы")
+        
+        return value.strip()
+
+    def get_possible_projects(self, obj):
         filtered_projects = Project.objects.filter(category=obj.category, is_active=True)
         return ProjectShortSerializer(filtered_projects, many=True).data

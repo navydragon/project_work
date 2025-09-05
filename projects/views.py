@@ -6,6 +6,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.routers import APIRootView
+# from django_ratelimit.decorators import ratelimit
+# from django.utils.decorators import method_decorator
 
 from .permissions import IsAdminOrReadOnly
 
@@ -18,6 +20,10 @@ from django.utils import timezone
 
 
 
+# @method_decorator(ratelimit(key='ip', rate='100/h', method='GET'), name='list')
+# @method_decorator(ratelimit(key='ip', rate='50/h', method='POST'), name='create')
+# @method_decorator(ratelimit(key='ip', rate='200/h', method='PATCH'), name='partial_update')
+# @method_decorator(ratelimit(key='ip', rate='200/h', method='PUT'), name='update')
 class TeamViewSet(viewsets.ModelViewSet):
     queryset = Team.objects.all()
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
@@ -29,6 +35,14 @@ class TeamViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return Team.objects.prefetch_related('participation__project','participation__team','members').all()
 
+    def get_permissions(self):
+        """
+        Разрешает обновление (PUT/PATCH) для всех пользователей,
+        остальные операции требуют админских прав
+        """
+        if self.action in ['update', 'partial_update']:
+            return [permissions.AllowAny()]
+        return [IsAdminOrReadOnly()]
 
     def list(self, request, *args, **kwargs):
         return Response({"detail": "Доступ к списку запрещен."}, status=status.HTTP_403_FORBIDDEN)
