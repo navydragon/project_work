@@ -18,7 +18,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-$4^8=c7ffb%^nkvg(70wu-1%wg
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,project.emiit.ru').split(',')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,project.emiit.ru,project-api.emiit.ru').split(',')
 
 
 # Application definition
@@ -71,7 +71,7 @@ TEMPLATES = [
 
 # CORS настройки
 CORS_ORIGIN_ALLOW_ALL = os.getenv('CORS_ORIGIN_ALLOW_ALL', 'False').lower() == 'true'
-CORS_ORIGIN_WHITELIST = os.getenv('CORS_ORIGIN_WHITELIST', 'http://localhost:3000,https://project.emiit.ru').split(',')
+CORS_ORIGIN_WHITELIST = os.getenv('CORS_ORIGIN_WHITELIST', 'http://localhost:3000,https://project.emiit.ru,https://project-api.emiit.ru').split(',')
 CORS_ALLOW_CREDENTIALS = True
 INTERNAL_IPS = [
     "213.208.179.169",
