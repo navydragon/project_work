@@ -5,14 +5,13 @@ from rest_framework import filters
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.response import Response
-from rest_framework.routers import APIRootView
 # from django_ratelimit.decorators import ratelimit
 # from django.utils.decorators import method_decorator
 
 from .permissions import IsAdminOrReadOnly
 
 
-from .models import Team, Semester, Project, Participation, Tag, Member, CPDSProject, Setting
+from .models import Team, Semester, Project, Participation, Tag, Member, CPDSProject
 from .serializers import TeamSerializer, SemesterSerializer, ProjectSerializer, \
     ParticipationSerializer, TagSerializer, MemberSerializer, CPDSProjectSerializer
 
@@ -77,11 +76,9 @@ class ParticipationViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     serializer_class = ParticipationSerializer
 
     def get_permissions(self):
-        """Динамически выбираем разрешения в зависимости от `open_registration`."""
-        open_registration = Setting.objects.filter(code="open_registration").first()
-        if not open_registration or open_registration.value != "true":
-            return [IsAdminOrReadOnly()]  # Разрешение только для админов
-        return [permissions.AllowAny()]
+        if getattr(self, 'action', None) == 'create':
+            return [permissions.AllowAny()]
+        return [IsAdminOrReadOnly()]
 
 
     def perform_create(self, serializer):
