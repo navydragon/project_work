@@ -2,6 +2,7 @@
 from rest_framework import serializers
 from django.core.exceptions import ValidationError
 from django.core.validators import EmailValidator, RegexValidator
+from django.db.models import Count
 import re
 from .models import Team, Semester, Project, Participation, Customer, Tag, \
     Member, CPDSProject
@@ -34,7 +35,7 @@ class TeamShortSerializer(serializers.ModelSerializer):
 
 
 class ProjectShortSerializer(serializers.ModelSerializer):
-    teams_count = serializers.SerializerMethodField()
+    teams_count = serializers.IntegerField(read_only=True)
     customer = CostomerSerializer()
     tags = TagSerializer(many=True)
     class Meta:
@@ -42,6 +43,12 @@ class ProjectShortSerializer(serializers.ModelSerializer):
         fields = ('id','name','max_teams','teams_count','image','customer', 'tags','target', 'is_new','is_active')
 
     def get_teams_count(self, obj):
+        """
+        Для обратной совместимости: если в queryset уже есть аннотация
+        teams_count, используем её. Иначе считаем через obj.teams.count().
+        """
+        if hasattr(obj, "teams_count") and obj.teams_count is not None:
+            return obj.teams_count
         return obj.teams.count()
 
 
@@ -150,5 +157,10 @@ class TeamSerializer(serializers.ModelSerializer):
         return value.strip()
 
     def get_possible_projects(self, obj):
-        filtered_projects = Project.objects.filter(category=obj.category, is_active=True)
+        filtered_projects = (
+            Project.objects.filter(category=obj.category, is_active=True)
+            .select_related("customer")
+            .prefetch_related("tags", "teams")
+            .annotate(teams_count=Count("teams"))
+        )
         return ProjectShortSerializer(filtered_projects, many=True).data

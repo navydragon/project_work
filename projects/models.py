@@ -84,6 +84,11 @@ class Project(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        indexes = [
+            models.Index(fields=["category", "is_active"]),
+        ]
+
 
 class Participation(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

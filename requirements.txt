@@ -34,3 +34,5 @@ typing_extensions==4.9.0
 tzdata==2023.4
 urllib3==2.2.0
 yarg==0.1.9
+locust
+psycopg[binary]
