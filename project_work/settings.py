@@ -97,6 +97,16 @@ DATABASES = {
     }
 }
 
+# Кэширование
+# Для разработки используется локальный кэш в памяти.
+# В продакшене рекомендуется заменить BACKEND на Redis или другой внешний кэш.
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "default-locmem-cache",
+    }
+}
+
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 

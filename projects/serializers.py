@@ -2,6 +2,7 @@
 from rest_framework import serializers
 from django.core.exceptions import ValidationError
 from django.core.validators import EmailValidator, RegexValidator
+from django.core.cache import cache
 from django.db.models import Count
 import re
 from .models import Team, Semester, Project, Participation, Customer, Tag, \
@@ -157,10 +158,56 @@ class TeamSerializer(serializers.ModelSerializer):
         return value.strip()
 
     def get_possible_projects(self, obj):
-        filtered_projects = (
-            Project.objects.filter(category=obj.category, is_active=True)
-            .select_related("customer")
-            .prefetch_related("tags", "teams")
-            .annotate(teams_count=Count("teams"))
+        category = obj.category
+        if category is None:
+            return []
+
+        cache_key = f"possible_projects:{category}:active"
+        cached_projects = cache.get(cache_key)
+
+        if cached_projects is None:
+            # Получаем все активные проекты нужной категории со связанными сущностями.
+            # Считаем teams_count один раз через аннотацию, чтобы избежать N+1 при первичном построении кэша.
+            queryset = (
+                Project.objects.filter(category=category, is_active=True)
+                .select_related("customer")
+                .prefetch_related("tags", "teams")
+                .annotate(teams_count=Count("teams"))
+            )
+            serialized = ProjectShortSerializer(queryset, many=True).data
+
+            # В кэше храним данные без teams_count, чтобы это поле всегда было актуально.
+            cached_projects = []
+            for project in serialized:
+                project_copy = dict(project)
+                project_copy.pop("teams_count", None)
+                cached_projects.append(project_copy)
+
+            # TTL 5 минут: заметно снижает нагрузку, при этом
+            # изменения проектов достаточно быстро попадут в кэш.
+            cache.set(cache_key, cached_projects, timeout=300)
+
+        # На этом этапе cached_projects не содержит teams_count.
+        # Сам счетчик считаем отдельно агрегирующим запросом к Participation.
+        project_ids = [p["id"] for p in cached_projects]
+        if not project_ids:
+            return []
+
+        participation_counts = (
+            Participation.objects.filter(project_id__in=project_ids)
+            .values("project_id")
+            .annotate(teams_count=Count("id"))
         )
-        return ProjectShortSerializer(filtered_projects, many=True).data
+        counts_map = {
+            str(row["project_id"]): row["teams_count"] for row in participation_counts
+        }
+
+        result = []
+        for project in cached_projects:
+            project_with_count = dict(project)
+            project_with_count["teams_count"] = counts_map.get(
+                project["id"], 0
+            )
+            result.append(project_with_count)
+
+        return result
