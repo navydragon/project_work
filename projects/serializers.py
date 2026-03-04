@@ -41,7 +41,7 @@ class ProjectShortSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True)
     class Meta:
         model = Project
-        fields = ('id','name','max_teams','teams_count','image','customer', 'tags','target', 'is_new','is_active')
+        fields = ('id','name','max_teams','teams_count','image','customer', 'tags','target', 'is_new','is_active','category')
 
     def get_teams_count(self, obj):
         """
@@ -86,7 +86,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'name', 'max_teams', 'teams_count', 'participants',
             'image', 'customer', 'task','problem', 'tags', 'description',
-            'target','owner','context','is_active','is_new'
+            'target','owner','context','is_active','is_new','category'
         )
 
     def get_teams_count(self, obj):

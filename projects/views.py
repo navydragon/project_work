@@ -1,12 +1,11 @@
 # myapp/views.py
 from rest_framework import viewsets, mixins, generics, status, permissions
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters
+from django_filters import rest_framework as filters
+from rest_framework import filters as drf_filters
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.response import Response
-# from django_ratelimit.decorators import ratelimit
-# from django.utils.decorators import method_decorator
 
 from .permissions import IsAdminOrReadOnly
 
@@ -25,14 +24,23 @@ from django.utils import timezone
 # @method_decorator(ratelimit(key='ip', rate='200/h', method='PUT'), name='update')
 class TeamViewSet(viewsets.ModelViewSet):
     queryset = Team.objects.all()
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filter_backends = [DjangoFilterBackend, drf_filters.SearchFilter]
     filterset_fields = ['semester']
     search_fields = ['name', 'captain_fullname']
     serializer_class = TeamSerializer
     permission_classes = [IsAdminOrReadOnly]
 
     def get_queryset(self):
-        return Team.objects.prefetch_related('participation__project','participation__team','members').all()
+        return (
+            Team.objects
+            .select_related('semester')
+            .prefetch_related(
+                'participation__project',
+                'participation__team',
+                'members',
+            )
+            .all()
+        )
 
     def get_permissions(self):
         """
@@ -62,13 +70,38 @@ class SemesterViewSet(viewsets.ModelViewSet):
         serializer.save()
 
 
+class NumberInFilter(filters.BaseInFilter, filters.NumberFilter):
+    """Фильтр, позволяющий передавать несколько числовых значений через запятую."""
+    pass
+
+
+class ProjectFilter(filters.FilterSet):
+    category = NumberInFilter(field_name="category", lookup_expr="in")
+
+    class Meta:
+        model = Project
+        fields = ["category"]
+
+
 class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
     permission_classes = [IsAdminOrReadOnly]
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ProjectFilter
 
     def get_queryset(self):
-        return Project.objects.prefetch_related('participants').all()
+        return (
+            Project.objects
+            .select_related('customer')
+            .prefetch_related(
+                'tags',
+                'participants__team',
+                'participants__project__customer',
+                'participants__project__tags',
+            )
+            .all()
+        )
 
 
 class ParticipationViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
