@@ -71,8 +71,29 @@ TEMPLATES = [
 
 # CORS настройки
 CORS_ORIGIN_ALLOW_ALL = os.getenv('CORS_ORIGIN_ALLOW_ALL', 'False').lower() == 'true'
-CORS_ORIGIN_WHITELIST = os.getenv('CORS_ORIGIN_WHITELIST', 'http://localhost:3000,https://project.emiit.ru,https://events.emiit.ru,https://project-api.emiit.ru').split(',')
-CORS_ALLOW_CREDENTIALS = True
+
+# django-cors-headers 4.x использует CORS_ALLOWED_ORIGINS (CORS_ORIGIN_WHITELIST устарел).
+# Чтобы не ломать старые .env, поддерживаем оба имени переменной окружения.
+_cors_env = os.getenv('CORS_ALLOWED_ORIGINS') or os.getenv('CORS_ORIGIN_WHITELIST')
+CORS_ALLOWED_ORIGINS = (
+    _cors_env.split(',')
+    if _cors_env
+    else 'http://localhost:3000,https://project.emiit.ru,https://events.emiit.ru,https://project-api.emiit.ru'.split(',')
+)
+
+# Нормализуем пробелы вокруг запятых, чтобы "a, b" тоже работало.
+CORS_ALLOWED_ORIGINS = [o.strip() for o in CORS_ALLOWED_ORIGINS if o.strip()]
+
+CORS_ALLOW_CREDENTIALS = os.getenv('CORS_ALLOW_CREDENTIALS', 'True').lower() == 'true'
+
+# Если используются cookie/CSRF между origin'ами (например, фронт events.* -> api.*),
+# нужно доверить источники для CSRF.
+_csrf_trusted = os.getenv('CSRF_TRUSTED_ORIGINS')
+CSRF_TRUSTED_ORIGINS = (
+    [o.strip() for o in _csrf_trusted.split(',') if o.strip()]
+    if _csrf_trusted
+    else ['https://project.emiit.ru', 'https://events.emiit.ru']
+)
 INTERNAL_IPS = [
     "213.208.179.169",
     "127.0.0.1",
@@ -186,12 +207,12 @@ if not DEBUG:
     # Безопасность сессий
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SAMESITE = 'Strict'
+    SESSION_COOKIE_SAMESITE = os.getenv('SESSION_COOKIE_SAMESITE', 'Strict')
     
     # Безопасность CSRF
     CSRF_COOKIE_SECURE = True
     CSRF_COOKIE_HTTPONLY = True
-    CSRF_COOKIE_SAMESITE = 'Strict'
+    CSRF_COOKIE_SAMESITE = os.getenv('CSRF_COOKIE_SAMESITE', 'Strict')
     
     # Безопасность X-Frame-Options
     X_FRAME_OPTIONS = 'DENY'

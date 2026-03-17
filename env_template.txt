@@ -15,7 +15,15 @@ DB_PORT=
 
 # CORS настройки
 CORS_ORIGIN_ALLOW_ALL=False
-CORS_ORIGIN_WHITELIST=http://localhost:3000,https://project.emiit.ru,https://project-api.emiit.ru
+# django-cors-headers 4.x:
+# - используйте CORS_ALLOWED_ORIGINS
+# - CORS_ORIGIN_WHITELIST оставлен для обратной совместимости со старым конфигом
+CORS_ALLOWED_ORIGINS=http://localhost:3000,https://project.emiit.ru,https://events.emiit.ru,https://project-api.emiit.ru
+CORS_ORIGIN_WHITELIST=http://localhost:3000,https://project.emiit.ru,https://events.emiit.ru,https://project-api.emiit.ru
+CORS_ALLOW_CREDENTIALS=True
+
+# Если фронтенд и API на разных origin'ах и используются cookie/CSRF
+CSRF_TRUSTED_ORIGINS=https://project.emiit.ru,https://events.emiit.ru
 
 # Email настройки (настройте по необходимости)
 EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
