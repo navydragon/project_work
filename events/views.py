@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from django.core.mail import send_mail
+from django.conf import settings
 
 
 from events.models import Event
@@ -86,6 +87,6 @@ def send_event_request_email(full_name, school, class_number, phone_number, even
         subject,
         message,
         from_email=None,
-        recipient_list=['priem-ief@yandex.ru'],
+        recipient_list=getattr(settings, "EVENT_REQUEST_RECIPIENTS", None) or ['priem-ief@yandex.ru'],
         fail_silently=False
     )

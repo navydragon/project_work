@@ -193,6 +193,14 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 SERVER_EMAIL = os.getenv('EMAIL_HOST_USER')
 DEFAULT_FROM_EMAIL = os.getenv('EMAIL_HOST_USER')
 
+# Куда отправлять уведомления при регистрации заявки на мероприятия.
+# Поддерживает список через запятую (например: a@b.ru,c@d.ru).
+EVENT_REQUEST_RECIPIENTS = [
+    e.strip()
+    for e in os.getenv('EVENT_REQUEST_RECIPIENTS', '').split(',')
+    if e.strip()
+]
+
 # ==================== НАСТРОЙКИ БЕЗОПАСНОСТИ ====================
 
 # Безопасность для продакшена
