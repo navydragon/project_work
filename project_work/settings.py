@@ -71,7 +71,7 @@ TEMPLATES = [
 
 # CORS настройки
 CORS_ORIGIN_ALLOW_ALL = os.getenv('CORS_ORIGIN_ALLOW_ALL', 'False').lower() == 'true'
-CORS_ORIGIN_WHITELIST = os.getenv('CORS_ORIGIN_WHITELIST', 'http://localhost:3000,https://project.emiit.ru,https://project-api.emiit.ru').split(',')
+CORS_ORIGIN_WHITELIST = os.getenv('CORS_ORIGIN_WHITELIST', 'http://localhost:3000,https://project.emiit.ru,https://events.emiit.ru,https://project-api.emiit.ru').split(',')
 CORS_ALLOW_CREDENTIALS = True
 INTERNAL_IPS = [
     "213.208.179.169",
